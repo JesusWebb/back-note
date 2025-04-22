@@ -7,8 +7,10 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "git add . && git commit -m \"build script\" && git push"
-
+    "del": "rimraf dist",
+    "cp": "cpy ../front/dist ./ --recursive",
+    "git": "git add . && git commit -m \"build script\" && git push",
+    "deploy": "npm run del && npm run cp && npm run git"
   },
   "author": "Jesús Castillo",
   "license": "ISC",
@@ -18,6 +20,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "cpy-cli": "^5.0.0",
+    "nodemon": "^3.1.9",
+    "rimraf": "^6.0.1"
   }
 }
