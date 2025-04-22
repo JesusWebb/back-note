@@ -8,11 +8,13 @@
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "del": "rimraf dist",
+    "del:all": "rimraf dist && rimraf ../front/dist",
     "cp": "cpy ../front/dist ./ --recursive",
     "git": "git add . && git commit -m \"build script\" && git push",
+    "build:front": "cd ../front && npm run build",
     "deploy": "npm run del && npm run cp && npm run git",
-    "deploy:full": "npm run del && cd ../front && npm run build && npm run cp",
-    "deploy:all": "npm run deploy:full && npm run git"
+    "deploy:front": "npm run del:all && npm run build:front && npm run cp",
+    "deploy:full": "npm run deploy:front && npm run git"
   },
   "author": "Jesús Castillo",
   "license": "ISC",
