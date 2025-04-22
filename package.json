@@ -10,7 +10,7 @@
     "del": "rimraf dist",
     "del:all": "rimraf dist && rimraf ../front/dist",
     "cp": "cpy ../front/dist ./ --recursive",
-    "git": "node commit.js",
+    "git": "node msgCommit.js",
     "build:front": "cd ../front && npm run build",
     "deploy": "npm run del && npm run cp && npm run git",
     "deploy:front": "npm run del:all && npm run build:front && npm run cp",
