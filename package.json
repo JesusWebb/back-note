@@ -11,10 +11,9 @@
     "del:all": "rimraf dist && rimraf ../front/dist",
     "cp": "cpy ../front/dist ./ --recursive",
     "git": "node msgCommit.js",
-    "build:front": "cd ../front && npm run build",
-    "deploy": "npm run del && npm run cp && npm run git",
-    "deploy:front": "npm run del:all && npm run build:front && npm run cp",
-    "deploy:full": "npm run deploy:front && npm run git"
+    "front": "cd ../front && npm run build",
+    "build": "npm run del:all && npm run front && npm run cp",
+    "deploy": "npm run build && npm run git"
   },
   "author": "Jesús Castillo",
   "license": "ISC",
