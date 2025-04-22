@@ -17,6 +17,7 @@
     "deploy:front": "npm run del:all && npm run build:front && npm run cp",
     "deploy:full": "npm run deploy:front && npm run git --"
   },
+  
   "author": "Jesús Castillo",
   "license": "ISC",
   "dependencies": {
