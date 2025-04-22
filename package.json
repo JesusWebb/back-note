@@ -10,7 +10,9 @@
     "del": "rimraf dist",
     "cp": "cpy ../front/dist ./ --recursive",
     "git": "git add . && git commit -m \"build script\" && git push",
-    "deploy": "npm run del && npm run cp && npm run git"
+    "deploy": "npm run del && npm run cp && npm run git",
+    "deploy:full": "npm run del && cd ../front && npm run build && npm run cp",
+    "deploy:all": "npm run deploy:full && npm run git"
   },
   "author": "Jesús Castillo",
   "license": "ISC",
