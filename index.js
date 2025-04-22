@@ -136,6 +136,25 @@ app.post('/api/notes', (request, response) => {
     .json(newNote)
 })
 
+app.put('/api/notes/:id', (request, response) => {
+  const id = request.params.id
+  const { body } = request
+
+  console.log(body);
+  
+  const newNoteList = notes
+    .map((note) => {
+      return Number(note.id) === Number(id)
+        ? body
+        : note
+      })
+  notes = newNoteList
+
+  response
+    .status(201)
+    .json(body)
+})
+
 app.delete('/api/notes/:id', (request, response) => {
   const id = request.params.id
   notes = notes.filter((note) => Number(note.id) !== Number(id))
