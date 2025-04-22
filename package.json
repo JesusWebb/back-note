@@ -14,7 +14,7 @@
     "build:front": "cd ../front && npm run build",
     "deploy": "npm run del && npm run cp && npm run git",
     "deploy:front": "npm run del:all && npm run build:front && npm run cp",
-    "deploy:full": "npm run deploy:front && git add . && git commit -m \"${npm_config_message:-Despliegue completo}\" && git push"
+    "deploy:full": "npm run deploy:front && npm run git"
   },
   "author": "Jesús Castillo",
   "license": "ISC",
