@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 require('dotenv').config()
 
 const express = require('express')
@@ -12,6 +13,17 @@ const { getNotes, getNote, createNote, updateNote, deleteNote } = require('./ser
 app.use(cors())
 app.use(express.static('dist'))
 app.use(express.json())
+
+// - INIT - CONTANST
+const STATUS_200 = 200
+const STATUS_204 = 204
+const STATUS_201 = 201
+const STATUS_400 = 400
+const STATUS_404 = 404
+const STATUS_500 = 500
+const SERVER_PORT = 3001
+
+// - END - CONTANST
 
 // - INIT - Middleware
 // INICIO
@@ -40,13 +52,13 @@ const morganInfo = morgan((tokens, req, res) => {
     '================================',
     '==== MORGAN',
     `${tokens.method(req, res)} ${tokens.url(req, res)} ${tokens.status(req, res)} ${tokens.res(req, res, 'content-length')} ${tokens['response-time'](req, res)} ms ${tokens.body(req, res)}`,
-    '================================\n\n\n'
+    '================================\n\n\n',
   ].join('\n')
 })
 // RUTA DESCONOCIDA
 const unknownEndpoint = (request, response) => {
   response
-    .status(404)
+    .status(STATUS_404)
     .send({ error: 'unknown endpoint' })
 }
 // - INIT - Middleware
@@ -59,27 +71,27 @@ app.use(requestLogger)
 
 app.get('/', (request, response) => {
   response
-    .status(200)
+    .status(STATUS_200)
     .send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/notes', (request, response) => {
   getNotes()
     .then((notes) => {
-      if(!notes) {
+      if (!notes) {
         response
-          .status(404)
-          .json({ error: `Notes not found` })
+          .status(STATUS_404)
+          .json({ isError: true, msgError: 'Notes not found' })
       }
 
       response
-        .status(200)
+        .status(STATUS_200)
         .json(notes)
     })
     .catch((error) => {
       response
-        .status(500)
-        .json({ error: `Error interno del servidor: ${ error }` })
+        .status(STATUS_500)
+        .json({ isError: true, msgError: `Error interno del servidor: ${error}` })
     })
 })
 
@@ -88,25 +100,25 @@ app.get('/api/notes/:id', (request, response) => {
 
   getNote({ id })
     .then((note) => {
-      if(!note) {
+      if (!note) {
         response
-          .status(404)
-          .json({ error: `Id not found` })
+          .status(STATUS_404)
+          .json({ msgError: 'Id not found' })
       }
 
       response
-        .status(200)
+        .status(STATUS_200)
         .json(note)
     })
     .catch((error) => {
-      if(error.name === 'CastError'){
+      if (error.name === 'CastError'){
         return response
-          .status(404)
-          .json({ error: `Id incorrecto:  ${ error }` }) 
+          .status(STATUS_404)
+          .json({ isError: true, msgError: `Id incorrecto:  ${error}` })
       }
-      response
-        .status(500)
-        .json({ error: `Error interno del servidor ${ error }` })
+      return response
+        .status(STATUS_500)
+        .json({ isError: true, msgError: `Error interno del servidor ${error}` })
     })
 })
 
@@ -116,8 +128,8 @@ app.post('/api/notes', (request, response) => {
 
   if (!body.content || !content) {
     return response
-      .status(400)
-      .json({ error: 'Body or content missing' })
+      .status(STATUS_400)
+      .json({ isError: true, msgError: 'Body or content missing' })
   }
 
   // const maxId = notes.length > 0
@@ -125,18 +137,24 @@ app.post('/api/notes', (request, response) => {
   //   : 0
   const data = {
     content: body.content || 'Default Text',
-    important: Boolean(body.import) || false
+    important: Boolean(body.import) || false,
   }
-  createNote({ data })
+  return createNote({ data })
     .then((dataRes) => {
-      response
-        .status(201)
+      return response
+        .status(STATUS_201)
         .json(dataRes)
     })
     .catch((error) => {
-      response
-        .status(500)
-        .json({ error: `Error interno del servidor ${ error }` })
+      if (error.name === 'ValidationError'){
+        return response
+          .status(STATUS_404)
+          .json({ error: `Error en la valdiacion:  ${error}` })
+      }
+
+      return response
+        .status(STATUS_500)
+        .json({ isError: true, msgError: `Error interno del servidor ${error}` })
     })
 })
 
@@ -144,18 +162,23 @@ app.put('/api/notes/:id', (request, response) => {
   const id = request.params.id
   const { body } = request
   const { content, important } = body
-  const note = { content, important}
+  const note = { content, important }
+  if (!body.content) {
+    return response
+      .status(STATUS_400)
+      .json({ isError: true, msgError: 'Body or content missing' })
+  }
 
-  updateNote({ id, note })
+  return updateNote({ id, note })
     .then((data) => {
-      response
-        .status(201)
+      return response
+        .status(STATUS_201)
         .json(data)
     })
     .catch((error) => {
       response
-        .status(500)
-        .json({ error: `Error interno del servidor ${ error }` })
+        .status(STATUS_500)
+        .json({ isError: true, msgError: `Error interno del servidor ${error}` })
     })
 })
 
@@ -165,19 +188,19 @@ app.delete('/api/notes/:id', (request, response) => {
   deleteNote({ id })
     .then(() => {
       response
-        .status(204)
+        .status(STATUS_204)
         .end()
     })
     .catch((error) => {
       response
-        .status(500)
-        .json({ error: `Error interno del servidor ${ error }` })
+        .status(STATUS_500)
+        .json({ isError: true, msgError: `Error interno del servidor ${error}` })
     })
 })
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || SERVER_PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

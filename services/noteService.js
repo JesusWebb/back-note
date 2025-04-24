@@ -1,44 +1,44 @@
 const Note = require('../models/noteModels')
 
-function getNotes() {
+function getNotes () {
   return Note
     .find({})
 }
 
-function getNote({ id }) {
+function getNote ({ id }) {
   return Note
     .findById(id)
 }
 
-function createNote({ data }) {
+function createNote ({ data }) {
   const { content, important } = data
   const note = new Note({
     content,
-    important
+    important,
   })
 
   return note
     .save()
 }
 
-function updateNote({ id, data }) {
+function updateNote ({ id, data }) {
   return Note
     .findByIdAndUpdate(
       id,
       data,
-      { new: true }
+      { new: true, runValidators: true, context: 'query' },
     )
 }
 
-function deleteNote({ id }) {
+function deleteNote ({ id }) {
   return Note
     .findByIdAndDelete(id)
 }
 
-module.exports = { 
+module.exports = {
   getNotes,
   getNote,
   createNote,
   updateNote,
-  deleteNote
+  deleteNote,
 }
