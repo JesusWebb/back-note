@@ -1,29 +1,17 @@
+require('dotenv').config()
+
 const express = require('express')
+const app = express()
+
+require('./bbdd/conexion')
 const morgan = require('morgan')
 const cors = require('cors')
 
-const app = express()
-app.use(cors())
-app.use(express.json())
-app.use(express.static('dist'))
+const { getNotes, getNote, createNote, updateNote, deleteNote } = require('./services/noteService')
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true
-  }
-]
+app.use(cors())
+app.use(express.static('dist'))
+app.use(express.json())
 
 // - INIT - Middleware
 // INICIO
@@ -39,16 +27,6 @@ const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
   console.log('Body:  ', request.body)
-  next()
-}
-// FINAL
-const endRequest = (request, response, next) => {
-  response.on('finish', () => {
-    console.log('================================')
-    console.log('==== FIN REQUEST')
-    console.log('================================')
-    console.log()
-  })
   next()
 }
 // MORGAN
@@ -74,12 +52,9 @@ const unknownEndpoint = (request, response) => {
 // - INIT - Middleware
 
 app.use(initRequest)
-
 app.use(morganInfo)
-
 // Funciona bien, se usa el otro de MORGAN
 // app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
-
 app.use(requestLogger)
 
 app.get('/', (request, response) => {
@@ -89,79 +64,115 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/notes', (request, response) => {
-  response
-    .status(200)
-    .json(notes)
+  getNotes()
+    .then((notes) => {
+      if(!notes) {
+        response
+          .status(404)
+          .json({ error: `Notes not found` })
+      }
+
+      response
+        .status(200)
+        .json(notes)
+    })
+    .catch((error) => {
+      response
+        .status(500)
+        .json({ error: `Error interno del servidor: ${ error }` })
+    })
 })
 
 app.get('/api/notes/:id', (request, response) => {
   const id = request.params.id
-  const note = notes.find((note) => Number(note.id) === Number(id))
 
-  if(!note) {
-    response
-      .status(404)
-      .end()
-      // .send("Nota no encontrada")
-  }
+  getNote({ id })
+    .then((note) => {
+      if(!note) {
+        response
+          .status(404)
+          .json({ error: `Id not found` })
+      }
 
-  response
-    .status(200)
-    .json(note)
+      response
+        .status(200)
+        .json(note)
+    })
+    .catch((error) => {
+      if(error.name === 'CastError'){
+        return response
+          .status(404)
+          .json({ error: `Id incorrecto:  ${ error }` }) 
+      }
+      response
+        .status(500)
+        .json({ error: `Error interno del servidor ${ error }` })
+    })
 })
 
 app.post('/api/notes', (request, response) => {
   const body = request.body
+  const { content } = body
 
-  if (!body.content) {
+  if (!body.content || !content) {
     return response
       .status(400)
-      .json({ error: 'content missing' })
+      .json({ error: 'Body or content missing' })
   }
 
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => n.id))
-    : 0
-
-  const newNote = {
-    id: maxId + 1,
-    content: body.content || '',
-    import: Boolean(body.import) || false
+  // const maxId = notes.length > 0
+  //   ? Math.max(...notes.map(n => n.id))
+  //   : 0
+  const data = {
+    content: body.content || 'Default Text',
+    important: Boolean(body.import) || false
   }
-
-  notes = [...notes, newNote]
-
-  response
-    .status(201)
-    .json(newNote)
+  createNote({ data })
+    .then((dataRes) => {
+      response
+        .status(201)
+        .json(dataRes)
+    })
+    .catch((error) => {
+      response
+        .status(500)
+        .json({ error: `Error interno del servidor ${ error }` })
+    })
 })
 
 app.put('/api/notes/:id', (request, response) => {
   const id = request.params.id
   const { body } = request
+  const { content, important } = body
+  const note = { content, important}
 
-  console.log(body);
-  
-  const newNoteList = notes
-    .map((note) => {
-      return Number(note.id) === Number(id)
-        ? body
-        : note
-      })
-  notes = newNoteList
-
-  response
-    .status(201)
-    .json(body)
+  updateNote({ id, note })
+    .then((data) => {
+      response
+        .status(201)
+        .json(data)
+    })
+    .catch((error) => {
+      response
+        .status(500)
+        .json({ error: `Error interno del servidor ${ error }` })
+    })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
   const id = request.params.id
-  notes = notes.filter((note) => Number(note.id) !== Number(id))
 
-  response
-    .status(204)
-    .end()
+  deleteNote({ id })
+    .then(() => {
+      response
+        .status(204)
+        .end()
+    })
+    .catch((error) => {
+      response
+        .status(500)
+        .json({ error: `Error interno del servidor ${ error }` })
+    })
 })
 
 app.use(unknownEndpoint)
