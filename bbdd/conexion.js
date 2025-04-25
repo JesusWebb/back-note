@@ -1,10 +1,21 @@
 const mongoose = require('mongoose')
 
-const password = process.env.MONGO_PASSWORD
-const url = `mongodb+srv://jesuscasesl:${password}@cluster0.ufduf9j.mongodb.net/noteApp?retryWrites=true&w=majority`
+const {
+  ENV_MONGODB_URI,
+  ENV_MONGODB_USER,
+  ENV_MONGODB_PASSWORD,
+  ENV_MONGODB_CLUSTER,
+  ENV_MONGODB_APP,
+} = require('../util/config')
+
+const uri = ENV_MONGODB_URI
+  .replace('${MONGODB_USER}', ENV_MONGODB_USER)
+  .replace('${MONGODB_PASSWORD}', ENV_MONGODB_PASSWORD)
+  .replace('${MONGODB_CLUSTER}', ENV_MONGODB_CLUSTER)
+  .replace('${MONGODB_APP}', ENV_MONGODB_APP)
 
 mongoose.set('strictQuery', false)
-mongoose.connect(url)
+mongoose.connect(uri)
   .then(() => {
     // eslint-disable-next-line no-console
     console.log('Conexión con MongoDB')

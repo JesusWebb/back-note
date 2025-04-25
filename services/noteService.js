@@ -1,4 +1,4 @@
-const Note = require('../models/noteModels')
+const Note = require('../models/noteModel')
 
 function getNotes () {
   return Note

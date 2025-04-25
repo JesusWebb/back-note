@@ -1,0 +1,17 @@
+require('dotenv').config()
+
+const ENV_PORT_SERVER = process.env.PORT_SERVER
+const ENV_MONGODB_URI = process.env.MONGODB_URI
+const ENV_MONGODB_USER = process.env.MONGODB_USER
+const ENV_MONGODB_PASSWORD = process.env.MONGODB_PASSWORD
+const ENV_MONGODB_CLUSTER = process.env.MONGODB_CLUSTER
+const ENV_MONGODB_APP = process.env.MONGODB_APP
+
+module.exports = {
+  ENV_PORT_SERVER,
+  ENV_MONGODB_URI,
+  ENV_MONGODB_USER,
+  ENV_MONGODB_PASSWORD,
+  ENV_MONGODB_CLUSTER,
+  ENV_MONGODB_APP,
+}

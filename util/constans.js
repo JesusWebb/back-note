@@ -1,0 +1,17 @@
+const STATUS_200 = 200
+const STATUS_204 = 204
+const STATUS_201 = 201
+const STATUS_400 = 400
+const STATUS_404 = 404
+const STATUS_500 = 500
+const PORT_SERVER = 3001
+
+module.exports = {
+  STATUS_200,
+  STATUS_204,
+  STATUS_201,
+  STATUS_400,
+  STATUS_404,
+  STATUS_500,
+  PORT_SERVER,
+}
