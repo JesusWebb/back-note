@@ -1,8 +1,8 @@
 const  app = require('./app')
 
-const  { infoLogger } = require('./util/logger')
-const  { PORT_SERVER } = require('./util/constans')
-const { ENV_PORT_SERVER } = require('./util/config')
+const { infoLogger } = require('./utils/logger')
+const { PORT_SERVER } = require('./utils/constants')
+const { ENV_PORT_SERVER } = require('./utils/config')
 
 const PORT = ENV_PORT_SERVER || PORT_SERVER
 

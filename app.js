@@ -3,15 +3,17 @@ const express = require('express')
 const cors = require('cors')
 require('./bbdd/conexion')
 
-const app = express()
-
 const notesRouter = require('./controllers/noteController')
-const { STATUS_200 } = require('./util/constans')
 const {
   initRequestMiddleware,
   requestLoggerMiddleware,
   morganInfoMiddleware,
-  unknownEndpointMiddleware } = require('./util/middleware')
+  unknownEndpointMiddleware,
+} = require('./utils/middleware')
+
+const { STATUS } = require('./utils/constants')
+
+const app = express()
 
 app.use(cors())
 app.use(express.static('dist'))
@@ -25,7 +27,7 @@ app.use(morganInfoMiddleware)
 
 app.get('/hello', (request, response) => {
   response
-    .status(STATUS_200)
+    .status(STATUS.OK)
     .send('<h1>Hello World!</h1>')
 })
 

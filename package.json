@@ -4,10 +4,10 @@
   "description": "back notes",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env NODE_ENV=production node --test",
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "del": "rimraf dist",
     "del:all": "rimraf dist && rimraf ../front/dist",
     "cp": "cpy ../front/dist ./ --recursive",
@@ -28,9 +28,11 @@
   "devDependencies": {
     "@eslint/js": "^9.25.1",
     "cpy-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
     "nodemon": "^3.1.9",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "supertest": "^7.1.0"
   }
 }

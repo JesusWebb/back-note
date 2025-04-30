@@ -1,6 +1,6 @@
 const morgan = require('morgan')
 const { infoLogger } = require('./logger')
-const { STATUS_404 } = require('./config')
+const { STATUS } = require('./constants')
 
 // INICIO
 function initRequestMiddleware (request, response, next) {
@@ -11,11 +11,12 @@ function initRequestMiddleware (request, response, next) {
 
 // LOGGER
 function requestLoggerMiddleware (request, response, next) {
+  const { method, path, body } = request
   infoLogger('================================')
   infoLogger('==== INFO')
-  infoLogger('Method:', request.method)
-  infoLogger('Path:  ', request.path)
-  infoLogger('Body:  ', request.body)
+  infoLogger('Method:', method)
+  infoLogger('Path:  ', path)
+  infoLogger('Body:  ', body)
   next()
 }
 
@@ -39,14 +40,14 @@ function morganInfoMiddleware (req, res, next) {
     if (err) {
       return next(err)
     }
-    next()
+    return next()
   })
 }
 
 // RUTA DESCONOCIDA
 function unknownEndpointMiddleware (request, response) {
   response
-    .status(STATUS_404)
+    .status(STATUS.NOT_FOUND)
     .send({ error: 'unknown endpoint' })
 }
 
