@@ -51,9 +51,40 @@ function unknownEndpointMiddleware (request, response) {
     .send({ error: 'unknown endpoint' })
 }
 
+// ERROR
+function errorHandler (error, request, response, next) {
+  infoLogger.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response
+      .status(STATUS.BAD_REQUEST)
+      .send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response
+      .status(STATUS.BAD_REQUEST)
+      .json({ error: error.message })
+  } else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
+    return response
+      .status(STATUS.BAD_REQUEST)
+      .json({ error: 'expected "username" to be unique' })
+  } else if (error.name === 'JsonWebTokenError') {
+    return response
+      .status(STATUS.NOT_AUTORIZED)
+      .json({ error: 'invalid token' })
+  } else if (error.name === 'TokenExpiredError') {
+    return response
+      .status(STATUS.NOT_AUTORIZED)
+      .json({ error: 'token expired' })
+  }
+
+  next(error)
+  return error
+}
+
 module.exports = {
   initRequestMiddleware,
   requestLoggerMiddleware,
   morganInfoMiddleware,
   unknownEndpointMiddleware,
+  errorHandler,
 }

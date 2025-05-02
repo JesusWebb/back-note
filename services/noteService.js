@@ -5,17 +5,19 @@ function getNotes () {
     .find({})
 }
 
+function getNotesAll () {
+  return Note
+    .find({})
+    .populate('user', { username: 1 })
+}
+
 function getNote ({ id }) {
   return Note
     .findById(id)
 }
 
 function createNote ({ data }) {
-  const { content, important } = data
-  const note = new Note({
-    content,
-    important,
-  })
+  const note = new Note(data)
 
   return note
     .save()
@@ -37,6 +39,7 @@ function deleteNote ({ id }) {
 
 module.exports = {
   getNotes,
+  getNotesAll,
   getNote,
   createNote,
   updateNote,

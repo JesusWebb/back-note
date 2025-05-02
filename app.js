@@ -4,6 +4,8 @@ const cors = require('cors')
 require('./bbdd/conexion')
 
 const notesRouter = require('./controllers/noteController')
+const usersRouter = require('./controllers/userController')
+const loginRouter = require('./controllers/loginController')
 const {
   initRequestMiddleware,
   requestLoggerMiddleware,
@@ -32,6 +34,8 @@ app.get('/hello', (request, response) => {
 })
 
 app.use('/api/notes', notesRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 app.use(unknownEndpointMiddleware)
 
